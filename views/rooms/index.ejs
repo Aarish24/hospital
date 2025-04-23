@@ -1,0 +1,72 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-bed"></i> Rooms</h2>
+        <a href="/api/rooms/view/add" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Room
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <% if (rooms && rooms.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Room ID</th>
+                                <th>Type</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% rooms.forEach(room => { %>
+                                <tr>
+                                    <td><%= room.r_id %></td>
+                                    <td><%= room.type %></td>
+                                    <td><%= room.capacity %></td>
+                                    <td>
+                                        <% if (room.availability) { %>
+                                            <span class="badge bg-success">Available</span>
+                                        <% } else { %>
+                                            <span class="badge bg-danger">Occupied</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="/api/rooms/view/edit/<%= room.r_id %>" class="btn btn-sm btn-warning btn-action">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-danger btn-action delete-btn" data-delete-url="/api/rooms/<%= room.r_id %>">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <% if (room.availability) { %>
+                                                <a href="/api/assigned/view/add" class="btn btn-sm btn-success btn-action">
+                                                    <i class="fas fa-user-plus"></i>
+                                                </a>
+                                            <% } else { %>
+                                                <a href="/api/assigned/<%= room.r_id %>" class="btn btn-sm btn-info btn-action">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </a>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    No rooms found. <a href="/api/rooms/view/add">Add a new room</a>.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

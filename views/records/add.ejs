@@ -1,0 +1,91 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-plus-circle"></i> Add New Record</h2>
+        <a href="/api/records/view/all" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Records
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="addRecordForm" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="app_no" class="form-label">Appointment Number</label>
+                    <input type="text" class="form-control" id="app_no" name="app_no" required>
+                    <div class="invalid-feedback">
+                        Please provide an appointment number.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="e_id" class="form-label">Employee</label>
+                    <select class="form-select" id="e_id" name="e_id" required>
+                        <option value="" selected disabled>Select Employee</option>
+                        <% employees.forEach(employee => { %>
+                            <option value="<%= employee.e_id %>"><%= employee.name %> (<%= employee.role %>)</option>
+                        <% }); %>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select an employee.
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary me-md-2">Reset</button>
+                    <button type="submit" class="btn btn-primary">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('addRecordForm');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                app_no: document.getElementById('app_no').value,
+                e_id: document.getElementById('e_id').value
+            };
+            
+            // Send API request
+            fetch('/api/records', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to add record');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Record added successfully!');
+                window.location.href = '/api/records/view/all';
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

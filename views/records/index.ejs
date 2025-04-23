@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-clipboard-list"></i> Records</h2>
+        <a href="/api/records/view/add" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Record
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <% if (records && records.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Record No</th>
+                                <th>Appointment No</th>
+                                <th>Employee</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% records.forEach(record => { %>
+                                <tr>
+                                    <td><%= record.record_no %></td>
+                                    <td><%= record.app_no %></td>
+                                    <td><%= record.employeename %></td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="/api/records/view/edit/<%= record.record_no %>" class="btn btn-sm btn-warning btn-action">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-danger btn-action delete-btn" data-delete-url="/api/records/<%= record.record_no %>">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <a href="/api/employees/<%= record.e_id %>" class="btn btn-sm btn-info btn-action">
+                                                <i class="fas fa-user"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    No records found. <a href="/api/records/view/add">Add a new record</a>.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

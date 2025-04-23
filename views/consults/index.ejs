@@ -1,0 +1,93 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-stethoscope"></i> Consultations</h2>
+        <a href="/api/consults/view/add" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Consultation
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <% if (consults && consults.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% consults.forEach(consult => { %>
+                                <tr>
+                                    <td><%= consult.patientname %></td>
+                                    <td><%= consult.doctorname %></td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-danger btn-action delete-btn" data-delete-url="/api/consults/<%= consult.p_id %>/<%= consult.doctor_eid %>">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <a href="/api/patients/<%= consult.p_id %>" class="btn btn-sm btn-info btn-action">
+                                                <i class="fas fa-user-injured"></i>
+                                            </a>
+                                            <a href="/api/employees/<%= consult.doctor_eid %>" class="btn btn-sm btn-success btn-action">
+                                                <i class="fas fa-user-md"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    No consultations found. <a href="/api/consults/view/add">Add a new consultation</a>.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete button functionality
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const deleteUrl = this.getAttribute('data-delete-url');
+                
+                if (confirm('Are you sure you want to delete this consultation?')) {
+                    console.log('Deleting consultation at URL:', deleteUrl);
+                    fetch(deleteUrl, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        console.log('Delete response status:', response.status);
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                console.error('Delete error data:', data);
+                                throw new Error(data.message || 'Failed to delete consultation');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Delete success data:', data);
+                        alert('Consultation deleted successfully!');
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Delete error:', error);
+                        alert('Error: ' + error.message);
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,96 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-plus-circle"></i> Assign Nurse to Room</h2>
+        <a href="/api/governs/view/all" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Nurse Assignments
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="addGovernForm" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="nurse_eid" class="form-label">Nurse</label>
+                    <select class="form-select" id="nurse_eid" name="nurse_eid" required>
+                        <option value="" selected disabled>Select Nurse</option>
+                        <% nurses.forEach(nurse => { %>
+                            <option value="<%= nurse.e_id %>"><%= nurse.name %></option>
+                        <% }); %>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select a nurse.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="r_id" class="form-label">Room</label>
+                    <select class="form-select" id="r_id" name="r_id" required>
+                        <option value="" selected disabled>Select Room</option>
+                        <% rooms.forEach(room => { %>
+                            <option value="<%= room.r_id %>"><%= room.r_id %> (<%= room.type %>)</option>
+                        <% }); %>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select a room.
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary me-md-2">Reset</button>
+                    <button type="submit" class="btn btn-primary">Assign Nurse</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('addGovernForm');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                nurse_eid: document.getElementById('nurse_eid').value,
+                r_id: document.getElementById('r_id').value
+            };
+            
+            // Send API request
+            fetch('/api/governs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to assign nurse');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Nurse assigned successfully!');
+                window.location.href = '/api/governs/view/all';
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

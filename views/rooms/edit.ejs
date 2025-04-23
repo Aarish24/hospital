@@ -1,0 +1,109 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-edit"></i> Edit Room</h2>
+        <a href="/api/rooms/view/all" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Rooms
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="editRoomForm" class="needs-validation" novalidate>
+                <input type="hidden" id="roomId" value="<%= room.r_id %>">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="type" class="form-label">Room Type</label>
+                        <select class="form-select" id="type" name="type" required>
+                            <option value="" disabled>Select Room Type</option>
+                            <option value="ICU" <%= room.type === 'ICU' ? 'selected' : '' %>>ICU</option>
+                            <option value="General" <%= room.type === 'General' ? 'selected' : '' %>>General</option>
+                            <option value="Private" <%= room.type === 'Private' ? 'selected' : '' %>>Private</option>
+                            <option value="Semi-Private" <%= room.type === 'Semi-Private' ? 'selected' : '' %>>Semi-Private</option>
+                            <option value="Emergency" <%= room.type === 'Emergency' ? 'selected' : '' %>>Emergency</option>
+                            <option value="Operation Theatre" <%= room.type === 'Operation Theatre' ? 'selected' : '' %>>Operation Theatre</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a room type.
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="capacity" class="form-label">Capacity</label>
+                        <input type="number" class="form-control" id="capacity" name="capacity" min="1" value="<%= room.capacity %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid capacity.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="availability" name="availability" <%= room.availability ? 'checked' : '' %>>
+                        <label class="form-check-label" for="availability">
+                            Room is available
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary me-md-2">Reset</button>
+                    <button type="submit" class="btn btn-primary">Update Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editRoomForm');
+        const roomId = document.getElementById('roomId').value;
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                type: document.getElementById('type').value,
+                capacity: parseInt(document.getElementById('capacity').value),
+                availability: document.getElementById('availability').checked
+            };
+            
+            // Send API request
+            fetch(`/api/rooms/${roomId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to update room');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Room updated successfully!');
+                window.location.href = '/api/rooms/view/all';
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

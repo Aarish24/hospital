@@ -1,0 +1,147 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="jumbotron bg-light p-5 rounded">
+        <h1 class="display-4">Hospital Management System</h1>
+        <p class="lead">A comprehensive solution for managing hospital operations</p>
+        <hr class="my-4">
+        <p>Use the navigation menu to access different modules of the system.</p>
+        
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-user-injured fa-3x text-primary mb-3"></i></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Patient Management</h6>
+                        <p class="card-text">Register new patients, update information, and view patient details.</p>
+                        <a href="/api/patients/view/all" class="btn btn-primary">Manage Patients</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-user-md fa-3x text-success mb-3"></i></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Staff Management</h6>
+                        <p class="card-text">Manage doctors, nurses, and other hospital staff members.</p>
+                        <a href="/api/employees/view/all" class="btn btn-success">Manage Staff</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-bed fa-3x text-info mb-3"></i></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Room Management</h6>
+                        <p class="card-text">Manage hospital rooms, assign patients, and track availability.</p>
+                        <a href="/api/rooms/view/all" class="btn btn-info">Manage Rooms</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-file-medical fa-3x text-warning mb-3"></i></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Test Reports</h6>
+                        <p class="card-text">Manage patient test reports and medical records.</p>
+                        <a href="/api/test-reports/view/all" class="btn btn-warning">Manage Reports</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-file-invoice-dollar fa-3x text-danger mb-3"></i></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Billing</h6>
+                        <p class="card-text">Manage patient bills and financial records.</p>
+                        <a href="/api/bills/view/all" class="btn btn-danger">Manage Bills</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-stethoscope fa-3x text-secondary mb-3"></i></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Consultations</h6>
+                        <p class="card-text">Manage doctor-patient consultations and appointments.</p>
+                        <a href="/api/consults/view/all" class="btn btn-secondary">Manage Consultations</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Hospital Statistics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="statistics-container">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Patients</h5>
+                                    <h2 class="card-text" id="patient-count">Loading...</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Doctors</h5>
+                                    <h2 class="card-text" id="doctor-count">Loading...</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Nurses</h5>
+                                    <h2 class="card-text" id="nurse-count">Loading...</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Available Rooms</h5>
+                                    <h2 class="card-text" id="rooms-available">Loading...</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fetch statistics when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('patient-count').textContent = data.patientCount;
+                document.getElementById('doctor-count').textContent = data.doctorCount;
+                document.getElementById('nurse-count').textContent = data.nurseCount;
+                document.getElementById('rooms-available').textContent = data.roomsAvailable;
+            })
+            .catch(error => {
+                console.error('Error fetching statistics:', error);
+                document.getElementById('statistics-container').innerHTML = '<div class="col-12 text-center text-danger">Error loading statistics</div>';
+            });
+    });
+</script>
+
+<%- include('partials/footer') %>

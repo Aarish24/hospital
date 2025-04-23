@@ -1,0 +1,128 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-edit"></i> Edit Test Report</h2>
+        <a href="/api/test-reports/view/all" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Test Reports
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="editTestReportForm" class="needs-validation" novalidate>
+                <input type="hidden" id="reportId" value="<%= report.report_id %>">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="p_id" class="form-label">Patient</label>
+                        <select class="form-select" id="p_id" name="p_id" required>
+                            <option value="" disabled>Select Patient</option>
+                            <% patients.forEach(patient => { %>
+                                <option value="<%= patient.p_id %>" <%= report.p_id === patient.p_id ? 'selected' : '' %>><%= patient.name %></option>
+                            <% }); %>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a patient.
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="r_id" class="form-label">Room</label>
+                        <select class="form-select" id="r_id" name="r_id" required>
+                            <option value="" disabled>Select Room</option>
+                            <% rooms.forEach(room => { %>
+                                <option value="<%= room.r_id %>" <%= report.r_id === room.r_id ? 'selected' : '' %>><%= room.r_id %> (<%= room.type %>)</option>
+                            <% }); %>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a room.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="test_type" class="form-label">Test Type</label>
+                    <select class="form-select" id="test_type" name="test_type" required>
+                        <option value="" disabled>Select Test Type</option>
+                        <option value="Blood Test" <%= report.test_type === 'Blood Test' ? 'selected' : '' %>>Blood Test</option>
+                        <option value="X-Ray" <%= report.test_type === 'X-Ray' ? 'selected' : '' %>>X-Ray</option>
+                        <option value="MRI" <%= report.test_type === 'MRI' ? 'selected' : '' %>>MRI</option>
+                        <option value="CT Scan" <%= report.test_type === 'CT Scan' ? 'selected' : '' %>>CT Scan</option>
+                        <option value="ECG" <%= report.test_type === 'ECG' ? 'selected' : '' %>>ECG</option>
+                        <option value="Ultrasound" <%= report.test_type === 'Ultrasound' ? 'selected' : '' %>>Ultrasound</option>
+                        <option value="Urine Test" <%= report.test_type === 'Urine Test' ? 'selected' : '' %>>Urine Test</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select a test type.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="result" class="form-label">Result</label>
+                    <textarea class="form-control" id="result" name="result" rows="3" required><%= report.result %></textarea>
+                    <div class="invalid-feedback">
+                        Please provide the test result.
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary me-md-2">Reset</button>
+                    <button type="submit" class="btn btn-primary">Update Test Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editTestReportForm');
+        const reportId = document.getElementById('reportId').value;
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                p_id: document.getElementById('p_id').value,
+                r_id: document.getElementById('r_id').value,
+                test_type: document.getElementById('test_type').value,
+                result: document.getElementById('result').value
+            };
+            
+            // Send API request
+            fetch(`/api/test-reports/${reportId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to update test report');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Test report updated successfully!');
+                window.location.href = '/api/test-reports/view/all';
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

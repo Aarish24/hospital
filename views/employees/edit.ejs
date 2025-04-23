@@ -1,0 +1,199 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-edit"></i> Edit Employee</h2>
+        <a href="/api/employees/view/all" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Employees
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="editEmployeeForm" class="needs-validation" novalidate>
+                <input type="hidden" id="employeeId" value="<%= employee.e_id %>">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="<%= employee.name %>" required>
+                        <div class="invalid-feedback">
+                            Please provide the employee's name.
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="" disabled>Select Role</option>
+                            <option value="Doctor" <%= employee.role === 'Doctor' ? 'selected' : '' %>>Doctor</option>
+                            <option value="Nurse" <%= employee.role === 'Nurse' ? 'selected' : '' %>>Nurse</option>
+                            <option value="Receptionist" <%= employee.role === 'Receptionist' ? 'selected' : '' %>>Receptionist</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select the employee's role.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="gender" class="form-label">Gender</label>
+                        <select class="form-select" id="gender" name="gender" required>
+                            <option value="" disabled>Select Gender</option>
+                            <option value="Male" <%= employee.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                            <option value="Female" <%= employee.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                            <option value="Other" <%= employee.gender === 'Other' ? 'selected' : '' %>>Other</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select the employee's gender.
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="salary" class="form-label">Salary</label>
+                        <input type="number" class="form-control" id="salary" name="salary" min="0" value="<%= employee.salary %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid salary.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="mobNo" class="form-label">Mobile Number</label>
+                    <input type="text" class="form-control" id="mobNo" name="mobNo" value="<%= employee.mob_no %>" required>
+                    <div class="invalid-feedback">
+                        Please provide a valid mobile number.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control" id="address" name="address" rows="2" required><%= employee.address %></textarea>
+                    <div class="invalid-feedback">
+                        Please provide the employee's address.
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="city" value="<%= employee.city %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a city.
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" name="state" value="<%= employee.state %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a state.
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="pinNo" class="form-label">PIN Code</label>
+                        <input type="text" class="form-control" id="pinNo" name="pinNo" value="<%= employee.pin_no %>" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid PIN code.
+                        </div>
+                    </div>
+                </div>
+                
+                <% if (employee.role === 'Doctor' && doctor) { %>
+                <div id="doctorFields">
+                    <hr>
+                    <h4>Doctor Details</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dept" class="form-label">Department</label>
+                            <input type="text" class="form-control" id="dept" name="dept" value="<%= doctor.dept %>" required>
+                            <div class="invalid-feedback">
+                                Please provide the doctor's department.
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="qualification" class="form-label">Qualification</label>
+                            <input type="text" class="form-control" id="qualification" name="qualification" value="<%= doctor.qualification %>" required>
+                            <div class="invalid-feedback">
+                                Please provide the doctor's qualification.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary me-md-2">Reset</button>
+                    <button type="submit" class="btn btn-primary">Update Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('editEmployeeForm');
+        const employeeId = document.getElementById('employeeId').value;
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                name: document.getElementById('name').value,
+                role: document.getElementById('role').value,
+                gender: document.getElementById('gender').value,
+                salary: parseFloat(document.getElementById('salary').value),
+                mobNo: document.getElementById('mobNo').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                pinNo: document.getElementById('pinNo').value
+            };
+            
+            // Add doctor fields if they exist
+            if (document.getElementById('dept')) {
+                formData.dept = document.getElementById('dept').value;
+                formData.qualification = document.getElementById('qualification').value;
+            }
+            
+            // Send API request
+            fetch(`/api/employees/${employeeId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to update employee');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Employee updated successfully!');
+                window.location.href = '/api/employees/view/all';
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

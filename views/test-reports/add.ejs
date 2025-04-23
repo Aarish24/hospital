@@ -1,0 +1,116 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-file-medical-alt"></i> Add New Test Report</h2>
+        <a href="/api/test-reports/view/all" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Test Reports
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="addTestReportForm" class="needs-validation" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="patientId" class="form-label">Patient</label>
+                        <select class="form-select" id="patientId" name="patientId" required>
+                            <option value="" selected disabled>Select Patient</option>
+                            <% patients.forEach(patient => { %>
+                                <option value="<%= patient.p_id %>"><%= patient.name %></option>
+                            <% }); %>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a patient.
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="roomId" class="form-label">Room</label>
+                        <select class="form-select" id="roomId" name="roomId" required>
+                            <option value="" selected disabled>Select Room</option>
+                            <% rooms.forEach(room => { %>
+                                <option value="<%= room.r_id %>"><%= room.r_id %> (<%= room.type %>)</option>
+                            <% }); %>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a room.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="testType" class="form-label">Test Type</label>
+                    <input type="text" class="form-control" id="testType" name="testType" required>
+                    <div class="invalid-feedback">
+                        Please provide the test type.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="result" class="form-label">Result</label>
+                    <textarea class="form-control" id="result" name="result" rows="3" required></textarea>
+                    <div class="invalid-feedback">
+                        Please provide the test result.
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary me-md-2">Reset</button>
+                    <button type="submit" class="btn btn-primary">Save Test Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('addTestReportForm');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                p_id: document.getElementById('patientId').value,
+                r_id: document.getElementById('roomId').value,
+                test_type: document.getElementById('testType').value,
+                result: document.getElementById('result').value
+            };
+            
+            // Send API request
+            fetch('/api/test-reports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to add test report');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Test report added successfully!');
+                window.location.href = '/api/test-reports/view/all';
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>
