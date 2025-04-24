@@ -196,7 +196,7 @@ exports.renderConsultations = async (req, res) => {
   try {
     console.log('Rendering consultations page');
     const result = await db.query(`
-      SELECT c.P_ID, c.Doctor_EID, p.Name as PatientName, e.Name as DoctorName 
+      SELECT c.P_ID as p_id, c.Doctor_EID as doctor_eid, p.Name as patientname, e.Name as doctorname 
       FROM Consults c
       JOIN Patient p ON c.P_ID = p.P_ID
       JOIN Employee e ON c.Doctor_EID = e.E_ID
@@ -218,11 +218,11 @@ exports.renderConsultations = async (req, res) => {
 exports.renderAddConsultation = async (req, res) => {
   try {
     console.log('Rendering add consultation page');
-    const patients = await db.query('SELECT P_ID, Name FROM Patient ORDER BY Name');
+    const patients = await db.query('SELECT P_ID as p_id, Name as name FROM Patient ORDER BY Name');
     console.log('Patients:', patients.rows);
     
     const doctors = await db.query(`
-      SELECT e.E_ID, e.Name, d.Dept 
+      SELECT e.E_ID as e_id, e.Name as name, d.Dept as dept 
       FROM Employee e
       JOIN Doctor d ON e.E_ID = d.E_ID
       WHERE e.Role = 'Doctor'
